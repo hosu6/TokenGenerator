@@ -21,6 +21,7 @@ public class AccountService {
     private final StringRedisTemplate redisTemplate;
 
     private static final String CODE_PREFIX = "MAIL_CODE:";
+    private static final String VERIFIED_PREFIX = "VERIFIED:";
 
     public void sendVerificationCode(String email) {
         if (accountRepository.findByEmail(email).isPresent()) {
@@ -38,17 +39,23 @@ public class AccountService {
         if (savedCode == null || !savedCode.equals(code)) {
             throw new RuntimeException("인증번호가 일치하지 않거나 만료되었습니다.");
         }
+
+        // 인증 성공 시 '인증됨' 플래그를 10분간 유지
+        redisTemplate.opsForValue().set(VERIFIED_PREFIX + email, "true", 10, TimeUnit.MINUTES);
+        redisTemplate.delete(CODE_PREFIX + email); // 코드 즉시 삭제
     }
 
     @Transactional
-    public Account registerNewAccount(String username, String email, String password, String code) {
+    public Account registerNewAccount(String username, String email, String password) {
+        // 1. 아이디 중복 체크
         if (accountRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("이미 존재하는 아이디입니다.");
         }
 
-        String savedCode = redisTemplate.opsForValue().get(CODE_PREFIX + email);
-        if (savedCode == null || !savedCode.equals(code)) {
-            throw new RuntimeException("인증번호가 일치하지 않거나 만료되었습니다.");
+        // 2. 인증 여부 확인
+        String isVerified = redisTemplate.opsForValue().get(VERIFIED_PREFIX + email);
+        if (isVerified == null || !isVerified.equals("true")) {
+            throw new RuntimeException("이메일 인증이 필요합니다.");
         }
 
         Account account = Account.builder()
@@ -56,13 +63,12 @@ public class AccountService {
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .role("USER")
-                .enabled(true) // 코드 인증 후 바로 활성화
+                .enabled(true)
                 .build();
 
         Account saved = accountRepository.save(account);
-        redisTemplate.delete(CODE_PREFIX + email); // 인증 성공 후 코드 삭제
+        redisTemplate.delete(VERIFIED_PREFIX + email); // 가입 완료 후 플래그 삭제
 
         return saved;
     }
-
 }
