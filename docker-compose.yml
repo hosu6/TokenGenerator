@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    container_name: token-generator-app
+    ports:
+      - "3002:3002"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/token_generator?createDatabaseIfNotExist=true
+      - SPRING_DATA_REDIS_HOST=redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  mysql:
+    image: mysql:8.0
+    container_name: token-generator-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: "token_generator"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: token-generator-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql-data:

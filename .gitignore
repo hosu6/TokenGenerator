@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Spring Boot
+HELP.md
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+log/
+*.log
+
+# Docker
+docker-compose.override.yml
