@@ -1,9 +1,11 @@
 package my.hosu.TokenGenerator.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -46,7 +48,11 @@ public class EmailService {
             helper.setText(htmlContent, true);
             mailSender.send(message);
         } catch (jakarta.mail.MessagingException e) {
+            log.error("Email sending failed to: {}", to, e);
             throw new RuntimeException("이메일 발송 실패: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected error during email sending to: {}", to, e);
+            throw new RuntimeException("이메일 발송 중 예상치 못한 오류 발생", e);
         }
     }
 }
