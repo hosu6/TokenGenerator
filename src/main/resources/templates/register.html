@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register - TokenGenerator</title>
+    <style>
+        :root {
+            --primary-blue: #1877f2;
+            --primary-green: #42b72a;
+            --hover-blue: #166fe5;
+            --hover-green: #36a420;
+            --bg-gray: #f0f2f5;
+            --text-dark: #1c1e21;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-gray);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h2 {
+            color: var(--primary-blue);
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .header p {
+            color: #606770;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .input-with-button {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            background-color: #f5f6f7;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background-color: #fff;
+            box-shadow: 0 0 0 2px #e7f3ff;
+        }
+
+        .btn-secondary {
+            padding: 0 16px;
+            background-color: #fff;
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #e7f3ff;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-green);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--hover-green);
+        }
+
+        .btn-primary:disabled {
+            background-color: #8ccf7e;
+            cursor: not-allowed;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dddfe2;
+        }
+
+        .footer-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        .status-msg {
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .status-success {
+            color: var(--primary-green);
+        }
+
+        .status-error {
+            color: #f02849;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>TokenGenerator</h2>
+            <p>빠르고 간편하게 가입하세요.</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <input type="text" id="username" placeholder="사용자 아이디" required>
+            </div>
+
+            <div class="form-group">
+                <div class="input-with-button">
+                    <input type="email" id="email" placeholder="이메일 주소" required>
+                    <button type="button" id="btnSendCode" class="btn-secondary">코드 발송</button>
+                </div>
+                <div id="emailMsg" class="status-msg"></div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-with-button">
+                    <input type="text" id="code" placeholder="인증코드" required>
+                    <button type="button" id="btnVerifyCode" class="btn-secondary">확인</button>
+                </div>
+                <div id="codeMsg" class="status-msg"></div>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="password" placeholder="새 비밀번호" required>
+            </div>
+
+            <button type="submit" id="btnRegister" class="btn-primary" disabled>가입 완료</button>
+        </form>
+
+        <div class="footer-link">
+            이미 계정이 있으신가요? <a th:href="@{/login}">로그인하기</a>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const btnSendCode = document.getElementById('btnSendCode');
+        const btnVerifyCode = document.getElementById('btnVerifyCode');
+        const btnRegister = document.getElementById('btnRegister');
+        const emailInput = document.getElementById('email');
+        const codeInput = document.getElementById('code');
+        const emailMsg = document.getElementById('emailMsg');
+        const codeMsg = document.getElementById('codeMsg');
+
+        let isEmailVerified = false;
+
+        function showMsg(el, text, isError) {
+            el.textContent = text;
+            el.style.display = 'block';
+            el.className = 'status-msg ' + (isError ? 'status-error' : 'status-success');
+        }
+
+        btnSendCode.addEventListener('click', async () => {
+            const email = emailInput.value;
+            if (!email) {
+                showMsg(emailMsg, '이메일을 입력해주세요.', true);
+                return;
+            }
+
+            btnSendCode.disabled = true;
+            showMsg(emailMsg, '코드를 전송 중입니다...', false);
+
+            try {
+                const response = await fetch(/*[[@{/register/send-code}]]*/ '/register/send-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                if (response.ok) {
+                    showMsg(emailMsg, '인증 코드가 전송되었습니다.', false);
+                    let timeLeft = 60;
+                    const timer = setInterval(() => {
+                        btnSendCode.textContent = `재전송 (${timeLeft}s)`;
+                        if (timeLeft <= 0) {
+                            clearInterval(timer);
+                            btnSendCode.disabled = false;
+                            btnSendCode.textContent = '코드 발송';
+                        }
+                        timeLeft--;
+                    }, 1000);
+                } else {
+                    const error = await response.text();
+                    showMsg(emailMsg, error, true);
+                    btnSendCode.disabled = false;
+                }
+            } catch (err) {
+                showMsg(emailMsg, '오류가 발생했습니다.', true);
+                btnSendCode.disabled = false;
+            }
+        });
+
+        btnVerifyCode.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const code = codeInput.value;
+
+            if (!code) {
+                showMsg(codeMsg, '코드를 입력해주세요.', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(/*[[@{/register/verify-code}]]*/ '/register/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                if (response.ok) {
+                    showMsg(codeMsg, '인증에 성공했습니다.', false);
+                    isEmailVerified = true;
+                    emailInput.readOnly = true;
+                    codeInput.readOnly = true;
+                    btnSendCode.disabled = true;
+                    btnVerifyCode.disabled = true;
+                    btnRegister.disabled = false;
+                } else {
+                    showMsg(codeMsg, '인증번호가 일치하지 않습니다.', true);
+                }
+            } catch (err) {
+                showMsg(codeMsg, '오류가 발생했습니다.', true);
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!isEmailVerified) return;
+
+            const payload = {
+                username: document.getElementById('username').value,
+                email: emailInput.value,
+                password: document.getElementById('password').value,
+                code: codeInput.value
+            };
+
+            try {
+                const response = await fetch(/*[[@{/register}]]*/ '/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('회원가입이 완료되었습니다!');
+                    window.location.href = /*[[@{/login}]]*/ '/login';
+                } else {
+                    const error = await response.text();
+                    alert('회원가입 실패: ' + error);
+                }
+            } catch (err) {
+                alert('오류가 발생했습니다.');
+            }
+        });
+    </script>
+</body>
+
+</html>
