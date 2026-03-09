@@ -226,23 +226,45 @@
             cursor: pointer;
         }
 
-        .qr-container {
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
+        .qr-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .qr-container:hover {
-            transform: scale(1.05);
+        .qr-image-wrapper {
+            background: white;
+            border-radius: 8px;
+            padding: 4px;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-image-wrapper:hover {
+            transform: scale(1.1);
+        }
+
+        .qr-image-wrapper img {
+            width: 100%;
+            height: 100%;
         }
 
         .qr-link {
             font-size: 0.75rem;
             color: var(--primary);
             text-decoration: underline;
-            display: block;
-            margin-top: 0.5rem;
             word-break: break-all;
+            transition: color 0.2s;
+        }
+
+        .qr-link:hover {
+            color: var(--primary-hover);
         }
     </style>
 </head>
@@ -254,13 +276,12 @@
             <div th:each="version : ${versions}" class="card">
                 <div class="version-row">
                     <div style="display: flex; gap: 1.5rem; align-items: center;">
-                        <div class="qr-container"
-                            th:attr="data-qr-src='data:image/png;base64,' + ${qrCodes.get(version.id)}, data-version-name=${version.versionName}"
-                            onclick="showQR(this)">
-                            <img th:src="'data:image/png;base64,' + ${qrCodes.get(version.id)}" alt="QR"
-                                style="width: 100px; height: 100px; background: white; border-radius: 8px; padding: 4px;">
-                            <a th:href="${qrLinks.get(version.id)}" target="_blank" class="qr-link"
-                                onclick="event.stopPropagation()">Verify Link</a>
+                        <div class="qr-box">
+                            <div class="qr-image-wrapper" onclick="showQR(this)"
+                                th:attr="data-qr-src='data:image/png;base64,' + ${qrCodes.get(version.id)}, data-version-name=${version.versionName}">
+                                <img th:src="'data:image/png;base64,' + ${qrCodes.get(version.id)}" alt="QR">
+                            </div>
+                            <a th:href="${qrLinks.get(version.id)}" target="_blank" class="qr-link">Verify Link</a>
                         </div>
                         <div class="version-info">
                             <h3 th:text="${version.versionName}">v1.0</h3>
