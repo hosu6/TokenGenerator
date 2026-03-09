@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Result - TokenGenerator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 4rem auto;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .success-text {
+            color: var(--success);
+        }
+
+        .danger-text {
+            color: var(--danger);
+        }
+
+        .details {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .label {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+
+        .value {
+            font-weight: 600;
+        }
+
+        .count-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div class="container">
+        <div th:if="${isValid}">
+            <div class="icon">🛡️</div>
+            <h1 class="success-text">Authentic Product</h1>
+            <p style="color: var(--text-dim);">This token has been verified as genuine.</p>
+
+            <div class="details">
+                <div class="detail-row">
+                    <span class="label">Product</span>
+                    <span class="value" th:text="${tokenInfo.productName}">Product Name</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Version</span>
+                    <span class="value" th:text="${tokenInfo.versionName}">v1.0</span>
+                </div>
+                <div class="detail-row"
+                    style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                    <span class="label">Total Verifications</span>
+                    <span class="value">
+                        <span th:text="${tokenInfo.verificationCount}">1</span> times
+                    </span>
+                </div>
+            </div>
+
+            <div th:if="${tokenInfo.verificationCount > 1}"
+                style="margin-bottom: 2rem; font-size: 0.875rem; color: #fbbf24;">
+                ⚠️ Warning: This token has been verified multiple times.
+            </div>
+        </div>
+
+        <div th:if="${!isValid}">
+            <div class="icon">🚫</div>
+            <h1 class="danger-text">Verification Failed</h1>
+            <p style="color: var(--text-dim);">The provided token or serial number is invalid.</p>
+        </div>
+
+        <a th:href="@{/}" class="btn">Return Home</a>
+    </div>
+</body>
+
+</html>

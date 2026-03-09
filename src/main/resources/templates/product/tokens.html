@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Token List - TokenGenerator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .token-val {
+            font-family: monospace;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .count-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 th:text="${product.name} + ' - ' + ${version.versionName}">Tokens</h1>
+                <p style="color: var(--text-dim)">Version Token List with Verification Details</p>
+            </div>
+            <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline">Back to Version</a>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>QR</th>
+                        <th>Token Value</th>
+                        <th>Verifications</th>
+                        <th>Expiry Date</th>
+                        <th>Last Verified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="token : ${tokens}">
+                        <td>
+                            <img th:src="'data:image/png;base64,' + ${tokenQrs.get(token.tokenValue)}" alt="QR"
+                                width="60">
+                        </td>
+                        <td>
+                            <div class="token-val" th:text="${token.tokenValue}">token</div>
+                        </td>
+                        <td>
+                            <span class="count-badge" th:text="${token.verificationCount}">0</span>
+                        </td>
+                        <td th:text="${#temporals.format(token.expiresAt, 'yyyy-MM-dd')}">2024-03-01</td>
+                        <td
+                            th:text="${token.lastVerifiedAt != null ? #temporals.format(token.lastVerifiedAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                            -</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

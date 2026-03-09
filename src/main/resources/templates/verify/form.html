@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Product - TokenGenerator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 4rem auto;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .info-card {
+            background: var(--glass);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .footer a:hover {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div class="container">
+        <h1>Product Verification</h1>
+        <p class="subtitle">Enter the details to check authenticity</p>
+
+        <div th:if="${error}" class="error" th:text="${error}">Error message</div>
+
+        <div th:if="${tokenInfo}" class="info-card">
+            <div class="info-label">Product</div>
+            <div class="info-value" th:text="${tokenInfo.productName}">Product Name</div>
+        </div>
+
+        <form th:action="@{/verify}" method="post">
+            <input type="hidden" name="productId" th:value="${productId}">
+
+            <div th:if="${product != null}">
+                <div th:each="field : ${product.requiredFields}" class="form-group">
+                    <label th:text="${field}">Verification Field</label>
+                    <input type="text" th:name="'attr_' + ${field}" th:placeholder="'Enter ' + ${field}" required>
+                </div>
+            </div>
+
+            <div th:if="${product == null}" class="form-group">
+                <label>Verification Info</label>
+                <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.5rem;">Please scan the QR code on
+                    the product or enter the token first.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Token</label>
+                <input type="text" name="token" th:value="${token}" placeholder="Enter the unique token" required>
+            </div>
+
+            <button type="submit" class="btn">Verify Authenticity</button>
+        </form>
+
+        <div class="footer">
+            <a th:href="@{/}" class="btn">Return Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

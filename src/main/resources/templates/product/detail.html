@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Product Detail - TokenGenerator</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            margin: 4rem auto;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div class="container">
+        <h1 th:text="${product.name}">Product Name</h1>
+        <p th:text="${product.description}">Description</p>
+
+        <hr>
+
+        <h3>Issue New Token</h3>
+        <form th:action="@{/products/{id}/token(id=${product.id})}" method="post">
+            <div th:each="field : ${product.requiredFields}" class="form-group">
+                <label th:text="${field}">Field Name</label>
+                <input type="text" th:name="'fields[' + ${field} + ']'" required
+                    th:placeholder="'Enter expected ' + ${field}">
+            </div>
+
+            <div class="form-group">
+                <label for="expirySeconds">Expiration (Seconds)</label>
+                <input type="number" id="expirySeconds" name="expirySeconds" value="3600" required>
+            </div>
+
+            <button type="submit" class="btn">Generate Token & QR Code</button>
+        </form>
+        <br>
+        <a th:href="@{/products}" class="btn"
+            style="background: transparent; border: 1px solid var(--border); color: var(--text-dim);">Back to List</a>
+    </div>
+</body>
+
+</html>

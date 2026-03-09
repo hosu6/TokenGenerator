@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Version Management - TokenGenerator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .product-name {
+            color: var(--primary);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .version-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .version-info h3 {
+            font-size: 1.25rem;
+        }
+
+        .version-meta {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .form-section {
+            margin-top: 3rem;
+            background: var(--glass);
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: white;
+        }
+
+        /* Token List Dropdown */
+        .token-dropdown {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            display: none;
+        }
+
+        .token-dropdown.active {
+            display: block;
+        }
+
+        .token-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+
+        .token-table th,
+        .token-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .token-table th {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        /* QR Zoom Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .qr-container {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .qr-container:hover {
+            transform: scale(1.05);
+        }
+
+        .qr-link {
+            font-size: 0.75rem;
+            color: var(--primary);
+            text-decoration: underline;
+            display: block;
+            margin-top: 0.5rem;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div class="container">
+        <div class="dashboard-grid">
+            <div th:each="version : ${versions}" class="card">
+                <div class="version-row">
+                    <div style="display: flex; gap: 1.5rem; align-items: center;">
+                        <div class="qr-container"
+                            th:attr="data-qr-src='data:image/png;base64,' + ${qrCodes.get(version.id)}, data-version-name=${version.versionName}"
+                            onclick="showQR(this)">
+                            <img th:src="'data:image/png;base64,' + ${qrCodes.get(version.id)}" alt="QR"
+                                style="width: 100px; height: 100px; background: white; border-radius: 8px; padding: 4px;">
+                            <a th:href="${qrLinks.get(version.id)}" target="_blank" class="qr-link"
+                                onclick="event.stopPropagation()">Verify Link</a>
+                        </div>
+                        <div class="version-info">
+                            <h3 th:text="${version.versionName}">v1.0</h3>
+                            <div class="version-meta">
+                                Created: <span
+                                    th:text="${#temporals.format(version.createdAt, 'yyyy-MM-dd HH:mm')}">Date</span>
+                            </div>
+                            <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                                <span th:each="entry : ${version.attributeValues}" class="field-tag"
+                                    style="font-size: 0.7rem;" th:text="${entry.key} + ': ' + ${entry.value}">Field:
+                                    Value</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" th:text="${totalCounts.get(version.id)}">0</div>
+                            <div class="stat-label">Total Tokens</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" th:text="${unverifiedCounts.get(version.id)}">0</div>
+                            <div class="stat-label">Unverified</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <form
+                        th:action="@{/products/{productId}/versions/{versionId}/tokens(productId=${product.id}, versionId=${version.id})}"
+                        method="post" style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="number" name="quantity" placeholder="Qty" style="width: 70px;" required>
+                        <input type="number" name="expiryDays" placeholder="Exp(Days)" style="width: 90px;" value="365"
+                            required>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;">Issue</button>
+                    </form>
+                    <button class="btn btn-outline" th:attr="data-version-id=${version.id}"
+                        onclick="toggleTokens(this)">View
+                        Tokens</button>
+                </div>
+
+                <div th:id="'tokens-' + ${version.id}" class="token-dropdown">
+                    <table class="token-table">
+                        <thead>
+                            <tr>
+                                <th>Token Value</th>
+                                <th>Verf.</th>
+                                <th>Expiry</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="token : ${versionTokens.get(version.id)}">
+                                <td th:text="${token.tokenValue}" th:id="'val-' + ${token.id}" class="token-val-cell">
+                                    token</td>
+                                <td th:text="${token.verificationCount}">0</td>
+                                <td th:text="${#temporals.format(token.expiresAt, 'MM-dd')}">expiry</td>
+                                <td>
+                                    <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"
+                                        th:attr="data-token=${token.tokenValue}" onclick="copyToken(this)">Copy</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Add New Version</h2>
+            <form th:action="@{/products/{id}/versions/new(id=${product.id})}" method="post">
+                <div class="form-group">
+                    <label>Version Name</label>
+                    <input type="text" name="versionName" placeholder="e.g. v1.0, 2024-03" required>
+                </div>
+                <!-- Dynamic Fields from Product -->
+                <div th:each="field : ${product.requiredFields}" class="form-group">
+                    <label th:text="${field}">Field Name</label>
+                    <input type="text" th:name="'attr_' + ${field}"
+                        th:placeholder="'Enter ' + ${field} + ' for this version'" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Version</button>
+            </form>
+        </div>
+    </div>
+    <!-- QR Modal -->
+    <div id="qrModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="modalTitle" style="color: #0f172a; margin-bottom: 1rem;">QR Code</h2>
+            <img id="largeQR" src="" alt="Large QR">
+            <p style="color: #64748b; margin-top: 1rem; font-size: 0.875rem;">Scan this to verify authenticity</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleTokens(btn) {
+            const versionId = btn.getAttribute('data-version-id');
+            const el = document.getElementById('tokens-' + versionId);
+            el.classList.toggle('active');
+        }
+
+        function showQR(container) {
+            const src = container.getAttribute('data-qr-src');
+            const title = container.getAttribute('data-version-name');
+            document.getElementById('largeQR').src = src;
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('qrModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        function copyToken(btn) {
+            const text = btn.getAttribute('data-token');
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Token copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+
+</body>
+
+</html>

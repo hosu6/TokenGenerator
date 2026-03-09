@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="navbar">
+    <style>
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .nav-btn-primary {
+            background-color: #6366f1;
+            color: white !important;
+        }
+
+        .nav-btn-primary:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc !important;
+        }
+
+        .nav-btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #94a3b8;
+        }
+
+        .nav-btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-btn-logout:hover {
+            background: #ef4444;
+            color: white !important;
+        }
+    </style>
+    <nav class="navbar">
+        <a th:href="@{/}" class="logo">TokenGenerator</a>
+        <div class="nav-links">
+            <div sec:authorize="isAuthenticated()" class="nav-links">
+                <a th:href="@{/products}" class="nav-btn nav-btn-outline">My Products</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="nav-btn nav-btn-logout">Logout</button>
+                </form>
+            </div>
+            <div sec:authorize="!isAuthenticated()" class="nav-links">
+                <a th:href="@{/verify}" class="nav-btn nav-btn-outline">Verify Product</a>
+                <a th:href="@{/login}" class="nav-btn nav-btn-outline">Login</a>
+                <a th:href="@{/register}" class="nav-btn nav-btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+</div>
+
+</html>
