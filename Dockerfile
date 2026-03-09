@@ -1,12 +1,12 @@
 # Build stage
-FROM eclipse-temurin:24-jdk-alpine AS build
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY . .
 RUN chmod +x gradlew
 RUN ./gradlew bootJar -x test
 
 # Run stage
-FROM eclipse-temurin:24-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
