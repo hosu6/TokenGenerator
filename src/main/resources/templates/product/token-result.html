@@ -150,11 +150,38 @@
             gap: 1rem;
             justify-content: center;
         }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: var(--primary);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 2000;
+            left: 50%;
+            bottom: 30px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: visibility 0s, opacity 0.5s linear;
+            opacity: 0;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 
 <body>
     <div th:replace="~{fragments/header :: navbar}"></div>
+    <div id="toast">Token copied to clipboard!</div>
     <div class="container">
         <div class="success-banner">
             ✨ Successfully issued <span th:text="${tokens.size()}">0</span> tokens!
@@ -184,7 +211,7 @@
                     <div th:each="token : ${tokens}" class="token-item">
                         <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between;">
                             <span th:text="${token}" style="font-weight: 600;">token-value</span>
-                            <button class="btn btn-primary"
+                            <button type="button" class="btn btn-primary"
                                 style="padding: 0.25rem 0.5rem; font-size: 0.75rem; margin-top: 0;"
                                 th:attr="data-token=${token}" onclick="copyToken(this)">Copy</button>
                         </div>
@@ -204,10 +231,18 @@
         function copyToken(btn) {
             const text = btn.getAttribute('data-token');
             navigator.clipboard.writeText(text).then(() => {
-                alert('Token copied to clipboard!');
+                showToast();
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function () {
+                toast.className = toast.className.replace("show", "");
+            }, 3000);
         }
     </script>
 </body>
