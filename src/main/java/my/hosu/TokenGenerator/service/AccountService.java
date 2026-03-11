@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -66,11 +67,26 @@ public class AccountService {
                 .password(passwordEncoder.encode(password))
                 .role("USER")
                 .enabled(true)
+                .apiKey(generateUniqueApiKey())
                 .build();
 
         Account saved = accountRepository.save(account);
         redisTemplate.delete(VERIFIED_PREFIX + email); // 가입 완료 후 플래그 삭제
 
         return saved;
+    }
+
+    @Transactional
+    public String regenerateApiKey(String username) {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        String newKey = generateUniqueApiKey();
+        account.setApiKey(newKey);
+        accountRepository.save(account);
+        return newKey;
+    }
+
+    private String generateUniqueApiKey() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

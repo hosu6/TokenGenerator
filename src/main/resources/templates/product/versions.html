@@ -374,6 +374,47 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- External API Integration -->
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <h4 style="font-size: 0.875rem; color: var(--text-dim);">External API Integration</h4>
+                        <span
+                            style="font-size: 0.7rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.2rem 0.5rem; border-radius: 1rem;">REST
+                            API</span>
+                    </div>
+                    <div
+                        style="background: rgba(15, 23, 42, 0.8); padding: 1.25rem; border-radius: 0.8rem; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.75rem; color: #e2e8f0; overflow-x: auto; border: 1px solid var(--border); line-height: 1.6; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                        <div style="margin-bottom: 0.25rem;"><span style="color: #fb7185; font-weight: 600;">POST</span>
+                            <span style="color: #38bdf8;">/token-generator/api/v1/tokens/issue</span> <span
+                                style="color: #64748b;">HTTP/1.1</span>
+                        </div>
+                        <div style="margin-bottom: 0.25rem;"><span style="color: #94a3b8;">Host: </span>localhost:3002
+                        </div>
+                        <div style="margin-bottom: 0.25rem;"><span style="color: #94a3b8;">Content-Type: </span><span
+                                style="color: #fcd34d;">application/json</span></div>
+                        <div style="margin-bottom: 0.25rem;"><span style="color: #94a3b8;">Authorization: </span><span
+                                style="color: #fcd34d;">Bearer &lt;YOUR_API_KEY&gt;</span>
+                            <a th:href="@{/profile}"
+                                style="font-size: 0.65rem; color: #818cf8; margin-left: 0.5rem; text-decoration: underline;">Get
+                                Key</a>
+                        </div>
+                        <br>
+                        <div style="color: #e2e8f0;">{</div>
+                        <div style="padding-left: 1.5rem;">
+                            <span style="color: #fca5a5;">"versionId"</span>: <span th:text="${version.id}"
+                                style="color: #818cf8;">1</span>,
+                        </div>
+                        <div style="padding-left: 1.5rem;">
+                            <span style="color: #fca5a5;">"count"</span>: <span style="color: #818cf8;">5</span>,
+                        </div>
+                        <div style="padding-left: 1.5rem;">
+                            <span style="color: #fca5a5;">"expiryDays"</span>: <span style="color: #818cf8;">365</span>
+                        </div>
+                        <div style="color: #e2e8f0;">}</div>
+                    </div>
+                </div>
             </div>
         </div>
 

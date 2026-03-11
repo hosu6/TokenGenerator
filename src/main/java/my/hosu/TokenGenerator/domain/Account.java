@@ -27,4 +27,7 @@ public class Account {
     private boolean enabled;
 
     private String role;
+
+    @Column(unique = true)
+    private String apiKey;
 }

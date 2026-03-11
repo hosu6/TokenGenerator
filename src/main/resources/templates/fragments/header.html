@@ -85,6 +85,7 @@
         <a th:href="@{/}" class="logo">TokenGenerator</a>
         <div class="nav-links">
             <div sec:authorize="isAuthenticated()" class="nav-links">
+                <a th:href="@{/profile}" class="nav-btn nav-btn-outline">Profile</a>
                 <a th:href="@{/products}" class="nav-btn nav-btn-outline">My Products</a>
                 <form th:action="@{/logout}" method="post" style="display: inline;">
                     <button type="submit" class="nav-btn nav-btn-logout">Logout</button>
