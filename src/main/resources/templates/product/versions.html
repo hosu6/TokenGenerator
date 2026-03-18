@@ -340,8 +340,7 @@
                         th:action="@{/products/{productId}/versions/{versionId}/tokens(productId=${product.id}, versionId=${version.id})}"
                         method="post" style="display: flex; gap: 0.5rem; align-items: center;">
                         <input type="number" name="quantity" placeholder="Qty" style="width: 70px;" required>
-                        <input type="number" name="expiryDays" placeholder="Exp(Days)" style="width: 90px;" value="365"
-                            required>
+                        <input type="number" name="expiryDays" placeholder="Exp(Days)" style="width: 120px;" required>
                         <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;">Issue</button>
                     </form>
                     <button class="btn btn-outline" th:attr="data-version-id=${version.id}"
